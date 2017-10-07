@@ -12,6 +12,7 @@ export default class ProjectDetailPage extends Component {
 
   render() {
     var project = this.props.project;
+    var coverImage = this.props.backgroundImageUrl;
     var title = project.title;
     var owner = project.links.owner.display_name;
     var createdAt = project.created_at;
@@ -25,7 +26,7 @@ export default class ProjectDetailPage extends Component {
       <View style={styles.container}>
         <Image
           style={styles.image}
-          source={{ uri: '/Users/ljubinkovicd/Desktop/MojeAplikacije/ReactNativeRepos/ZooReact/Resources/testImg.png' }}
+          source={{ uri: coverImage }}
         />
         <View style={styles.heading}>
           <Text style={styles.title}>{title}</Text>
