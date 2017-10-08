@@ -19,12 +19,49 @@ class ListItem extends React.PureComponent {
     super(props);
 
     this.state = {
-      image: '',
+      avatarImage: '',
+      backgroundImage: '',
     };
   }
 
   _onTap = () => {
-    this.props.onRowTap(this.props.index, this.state.image);
+    this.props.onRowTap(this.props.index, this.state.backgroundImage);
+  }
+
+  _sendProjectRequests = (backgroundImageRequest, avatarRequest) => {
+
+    var myHeaders = new Headers();
+    /*
+      All requests should set Accept: application/vnd.api+json; version=1.
+      You will receive a 404 Not Found without it.
+    */
+    myHeaders.set("Content-Type", "application/json");
+    myHeaders.set("Accept", "application/vnd.api+json; version=1");
+
+    var myInit = {
+      method: 'GET',
+      headers: myHeaders,
+      mode: 'cors',
+      cache: 'default'
+    };
+
+    fetch(backgroundImageRequest, myInit)
+      .then(response => response.json())
+      .then(responseDataJson => {
+        console.log(responseDataJson.media[0].src),
+        this.setState({ backgroundImage: responseDataJson.media[0].src })
+      }).then(() => {
+        fetch(avatarRequest, myInit)
+          .then(response => response.json())
+          .then(responseDataJson => {
+            console.log(responseDataJson.media[0].src),
+            this.setState({ avatarImage: responseDataJson.media[0].src })
+          });
+      }).catch(error =>
+        this.setState({
+          isLoading: false,
+          message: 'Something bad happened' + error
+        }));
   }
 
   _sendRequest = (request) => {
@@ -59,19 +96,22 @@ class ListItem extends React.PureComponent {
   }
 
   _handleResponse = (response) => {
-    this.setState({ isLoading: false, message: '' });
-      console.log('Project background image found: ' + response.media[0].src);
+      // console.log('Project background image found: ' + response.media[0].src);
 
       this.setState({image: response.media[0].src})
   }
 
   componentDidMount() {
-    this._sendRequest(BASE_URL + this.props.project.links.background.href);
+    this._sendProjectRequests(
+      BASE_URL + this.props.project.links.background.href,
+      BASE_URL + this.props.project.links.avatar.href
+    );
+
   }
 
   render() {
     const project = this.props.project;
-    const projectImgUrl = this.state.image;
+    const avatarImageUrl = this.state.avatarImage;
     const title = project.title;
     const description = project.description;
 
@@ -81,7 +121,7 @@ class ListItem extends React.PureComponent {
         underlayColor='#dddddd'>
         <View>
           <View style={styles.rowContainer}>
-            <Image style={styles.thumb} source={{ uri: projectImgUrl != '' ? projectImgUrl : '/Users/ljubinkovicd/Desktop/MojeAplikacije/ReactNativeRepos/ZooReact/Resources/img1.jpg' }} />
+            <Image style={styles.thumb} source={{ uri: avatarImageUrl != '' ? avatarImageUrl : '/Users/ljubinkovicd/Desktop/MojeAplikacije/ReactNativeRepos/ZooReact/Resources/noImagePlaceholder.gif' }} />
             <View style={styles.textContainer}>
               <Text style={styles.price}>{title}</Text>
               <Text style={styles.title} numberOfLines={1}>{description}</Text>
@@ -106,12 +146,12 @@ export default class ProjectsResults extends Component {
     />
   );
 
-    _onRowTap = (index, image) => {
+    _onRowTap = (index, backgroundImage) => {
       console.log("Pressed row: " + index);
       this.props.navigator.push({
-        title: "Project",
+        title: this.props.projects[index].display_name,
         component: ProjectDetailPage,
-        passProps: {project: this.props.projects[index], backgroundImageUrl: image != '' ? image : '/Users/ljubinkovicd/Desktop/MojeAplikacije/ReactNativeRepos/ZooReact/Resources/img1.jpg'}
+        passProps: {project: this.props.projects[index], backgroundImageUrl: backgroundImage != '' ? backgroundImage : '/Users/ljubinkovicd/Desktop/MojeAplikacije/ReactNativeRepos/ZooReact/Resources/noImagePlaceholder.gif'}
       });
     }
 
@@ -136,6 +176,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     marginRight: 10,
+    borderRadius: 40,
   },
   textContainer: {
     flex: 1,

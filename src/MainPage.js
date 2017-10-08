@@ -8,11 +8,12 @@ import {
   TouchableHighlight,
   View,
   NavigatorIOS,
-  Image
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 
 import ProjectsResults from './ProjectsResults';
-import TestMasonry from './TestMasonry';
+import CollectionsResults from './CollectionsResults';
 
 import apiClient from 'panoptes-client/lib/api-client';
 import auth from 'panoptes-client/lib/auth';
@@ -20,8 +21,10 @@ import oauth from 'panoptes-client/lib/oauth';
 import talkClient from 'panoptes-client/lib/talk-client';
 
 const PROJECTS_URL = 'https://panoptes.zooniverse.org/api/projects';
+const COLLECTIONS_URL = 'https://panoptes.zooniverse.org/api/collections';
+const USERS_URL = 'https://panoptes.zooniverse.org/api/users';
 
-function urlRequestQuery(page = 1, pageSize = 20, sort = "id") {
+function urlProjectsRequestQuery(page = 1, pageSize = 20, sort = "id") {
 
   const data = {
     page: page,
@@ -86,7 +89,7 @@ export default class MainPage extends Component {
     // if (response.application_response_code.substr(0, 1) === '2') { // If the response code starts with 2**
       // console.log('Projects found: ' + response.projects.length);
       this.props.navigator.push({
-        title: 'Results',
+        title: 'Projects',
         component: ProjectsResults,
         passProps: {projects: response.projects}
       });
@@ -97,29 +100,30 @@ export default class MainPage extends Component {
 
   _onProjectsButtonTapped = () => {
     console.log("Projects tapped");
-    const requestQuery = urlRequestQuery(); // Using default parameters here
+    const requestQuery = urlProjectsRequestQuery(); // Using default parameters here
     this._sendRequest(requestQuery);
   }
 
-  _onSubjectsButtonTapped = () => {
-    console.log("Subjects tapped");
+  _onCollectionsButtonTapped = () => {
+    console.log("Collections tapped");
     this.props.navigator.push({
-      title: 'Masonry',
-      component: TestMasonry,
+      title: 'Collections Results',
+      component: CollectionsResults,
       passProps: {}
     });
   }
 
   _onUsersButtonTapped = () => {
     console.log("Users tapped");
-    this.props.navigator.push({
-      title: 'GridLayout',
-      component: TestGridLayout,
-      passProps: {}
-    });
+    // this.props.navigator.push({
+    //   title: 'GridLayout',
+    //   component: TestGridLayout,
+    //   passProps: {}
+    // });
   }
 
   render() {
+    const spinner = this.state.isLoading ? <ActivityIndicator size={0} color='#003366'/> : null;
 
     return (
       <View style={styles.container}>
@@ -128,21 +132,28 @@ export default class MainPage extends Component {
           <Image style={styles.backgroundImage} source={{ uri: backgroundImageUri }}/>
         </View>
 
-        <TouchableHighlight onPress={this._onProjectsButtonTapped} underlayColor="transparent">
-          <View style={styles.prettyButton}>
-            <Text style={styles.prettyButtonText}>Projects</Text>
-          </View>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={this._onSubjectsButtonTapped} underlayColor="transparent">
-          <View style={styles.prettyButton}>
-            <Text style={styles.prettyButtonText}>Subjects</Text>
-          </View>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={this._onUsersButtonTapped} underlayColor="transparent">
-          <View style={styles.prettyButton}>
-            <Text style={styles.prettyButtonText}>Users</Text>
-          </View>
-        </TouchableHighlight>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          {spinner}
+        </View>
+
+        <View style={{ flex: 2, justifyContent: 'flex-start' }}>
+          <TouchableHighlight onPress={this._onProjectsButtonTapped} underlayColor="transparent">
+            <View style={styles.prettyButton}>
+              <Text style={styles.prettyButtonText}>Projects</Text>
+            </View>
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this._onCollectionsButtonTapped} underlayColor="transparent">
+            <View style={styles.prettyButton}>
+              <Text style={styles.prettyButtonText}>Collections</Text>
+            </View>
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this._onUsersButtonTapped} underlayColor="transparent">
+            <View style={styles.prettyButton}>
+              <Text style={styles.prettyButtonText}>Users</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
+
       </View>
     );
   }
