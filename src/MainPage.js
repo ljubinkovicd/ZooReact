@@ -100,8 +100,15 @@ export default class MainPage extends Component {
 
   _onProjectsButtonTapped = () => {
     console.log("Projects tapped");
-    const requestQuery = urlProjectsRequestQuery(); // Using default parameters here
-    this._sendRequest(requestQuery);
+    // const requestQuery = urlProjectsRequestQuery(); // Using default parameters here
+    // this._sendRequest(requestQuery);
+    this.setState({ isLoading: false, message: '' });
+    // if (response.application_response_code.substr(0, 1) === '2') { // If the response code starts with 2**
+      // console.log('Projects found: ' + response.projects.length);
+      this.props.navigator.push({
+        title: 'Projects',
+        component: ProjectsResults
+      });
   }
 
   _onCollectionsButtonTapped = () => {

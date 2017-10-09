@@ -11,7 +11,9 @@
 		"panoptes-client": "^2.7.2",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.48.4",
+		"react-native-elements": "^0.17.0",
 		"react-native-masonry": "^0.4.2",
+		"react-native-vector-icons": "^4.4.2",
 		"url": "^0.11.0"
 	},
 	"devDependencies": {

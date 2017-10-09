@@ -14,6 +14,8 @@
  } from 'react-native';
  import MainPage from './src/MainPage';
 
+console.disableYellowBox = true;
+
 export default class ZooReact extends Component {
   render() {
     return (
